@@ -1,10 +1,11 @@
-package main
+package app
 
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
+	"fynebind/internal/model"
 	widget2 "fynebind/pkg/widget"
 	"image/color"
 	"log"
@@ -15,16 +16,16 @@ import (
 // There are two bind data to choose from.
 // One of the bind data is continuously updated every 5 seconds.
 func doubleLabelUntypedBind() *fyne.Container {
-	myData1 := &MyData{
+	myData1 := &model.MyData{
 		Name: "Kalle Gurka",
 		Info: "Some information",
-		Sub:  SubData{Data: "Some data"},
+		Sub:  model.SubData{Data: "Some data"},
 	}
 
-	myData2 := &MyData{
+	myData2 := &model.MyData{
 		Name: "Kalle Gurka 2",
 		Info: "Some information 2",
-		Sub:  SubData{Data: "Some data 2"},
+		Sub:  model.SubData{Data: "Some data 2"},
 	}
 
 	boundMyData1 := binding.BindUntyped(myData1)

@@ -1,10 +1,11 @@
-package main
+package app
 
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
+	"fynebind/internal/model"
 	widget2 "fynebind/pkg/widget"
 	"image/color"
 	"math/rand"
@@ -19,19 +20,19 @@ import (
 // The widget list is then automatically updated on list.Reload() from the backing list.
 // Any data changes of the items in the backing list are not guaranteed to be updated in the UI.
 func doubleLabelListUntypedBind() *fyne.Container {
-	var myDataList []MyData
+	var myDataList []model.MyData
 	for i := 0; i < 2; i++ {
 		myDataList = append(myDataList, createMyData(rand.Int()))
 	}
 
 	// A bit awkward, the bounded untyped list can only handle interface{} (and set initially to an []interface{} list).
 	// There does not seem to be a way to use the raw myDataList (of type []MyData), but it has to be converted into []interface{}.
-	interfaceData := make([]interface{}, len(myDataList))
+	interfaceDataList := make([]interface{}, len(myDataList))
 	for i, myData := range myDataList {
-		interfaceData[i] = myData
+		interfaceDataList[i] = myData
 	}
 
-	untypedList := binding.BindUntypedList(&interfaceData)
+	untypedList := binding.BindUntypedList(&interfaceDataList)
 
 	// Add a new list entry every 5 seconds to the original (external) list
 	go func() {
@@ -41,9 +42,9 @@ func doubleLabelListUntypedBind() *fyne.Container {
 			myData.Sub.Data = time.Now().Format("15:04:05")
 
 			var iMyData interface{}
-			iMyData = myData                               // A bit awkward, you need to convert this to an interface{} to be able to add it
-			interfaceData = append(interfaceData, iMyData) // Add item to the original (external) list
-			untypedList.Reload()                           // Ask the untyped bound list to update
+			iMyData = myData                                       // A bit awkward, you need to convert this to an interface{} to be able to add it
+			interfaceDataList = append(interfaceDataList, iMyData) // Add item to the original (external) list
+			untypedList.Reload()                                   // Ask the untyped bound list to update
 		}
 	}()
 
@@ -55,9 +56,9 @@ func doubleLabelListUntypedBind() *fyne.Container {
 		},
 
 		func(item binding.DataItem, object fyne.CanvasObject) {
-			untyped := item.(binding.Untyped)   // Cast list item to binding.Untyped
-			myDataInterface, _ := untyped.Get() // Get the interface{} value
-			myData := myDataInterface.(MyData)  // Cast the interface{} value into the actual MyData value
+			untyped := item.(binding.Untyped)        // Cast list item to binding.Untyped
+			myDataInterface, _ := untyped.Get()      // Get the interface{} value
+			myData := myDataInterface.(model.MyData) // Cast the interface{} value into the actual MyData value
 
 			untypedMyData := binding.BindUntyped(&myData) // The DoubleLabel widget wants untyped data to be set to it (not that we use that bind functionality later on)
 
@@ -70,21 +71,21 @@ func doubleLabelListUntypedBind() *fyne.Container {
 		myData := createMyData(rand.Int())
 
 		var iMyData interface{}
-		iMyData = myData                               // A bit awkward, you need to convert this to an interface{} to be able to add it
-		interfaceData = append(interfaceData, iMyData) // Add item to the original (external) list
-		untypedList.Reload()                           // Ask the untyped bound list to update
+		iMyData = myData                                       // A bit awkward, you need to convert this to an interface{} to be able to add it
+		interfaceDataList = append(interfaceDataList, iMyData) // Add item to the original (external) list
+		untypedList.Reload()                                   // Ask the untyped bound list to update
 
 		//untypedList.Append(myData)
 	})
 
 	removeFirstButton := widget.NewButton("Remove first", func() {
-		interfaceData = interfaceData[1:] // Change the size of the original (external) list
-		untypedList.Reload()              // Ask the untyped bound list to update
+		interfaceDataList = interfaceDataList[1:] // Change the size of the original (external) list
+		untypedList.Reload()                      // Ask the untyped bound list to update
 	})
 
 	removeLastButton := widget.NewButton("Remove last", func() {
-		interfaceData = interfaceData[:len(interfaceData)-1] // Change the size of the original (external) list
-		untypedList.Reload()                                 // Ask the untyped bound list to update
+		interfaceDataList = interfaceDataList[:len(interfaceDataList)-1] // Change the size of the original (external) list
+		untypedList.Reload()                                             // Ask the untyped bound list to update
 	})
 
 	captionPanel := createCaptionPanel("List with bound data-list", "UI list listens to size changes in data-list")

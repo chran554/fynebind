@@ -1,10 +1,11 @@
-package main
+package app
 
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
+	"fynebind/internal/model"
 	widget2 "fynebind/pkg/widget"
 	"image/color"
 	"math/rand"
@@ -12,41 +13,41 @@ import (
 )
 
 func doubleLabelUntypedBindInList() *fyne.Container {
-	var dataList []binding.ExternalUntyped
+	var boundDataList []binding.ExternalUntyped
 
 	for i := 0; i < 5; i++ {
 		myData := createMyData(rand.Int())
-		dataList = append(dataList, binding.BindUntyped(&myData))
+		boundDataList = append(boundDataList, binding.BindUntyped(&myData))
 	}
 
 	list := widget.NewList(
 		func() int {
-			return len(dataList)
+			return len(boundDataList)
 		},
 		func() fyne.CanvasObject {
 			return widget2.NewDoubleLabelWithData(nil, DoubleLabelMyDataContentExtractorFn)
 		},
 		func(id widget.ListItemID, object fyne.CanvasObject) {
-			boundData := dataList[id]
+			boundData := boundDataList[id]
 			object.(*widget2.DoubleLabel).Bind(boundData)
 		},
 	)
 
 	button1 := widget.NewButton("Change data #1", func() {
-		if len(dataList) >= 1 {
-			boundValue := dataList[0]
+		if len(boundDataList) >= 1 {
+			boundValue := boundDataList[0]
 			value, _ := boundValue.Get()
-			myData := value.(MyData)
+			myData := value.(model.MyData)
 			myData.Sub.Data = time.Now().Format("15:04:05")
 			boundValue.Set(myData)
 		}
 	})
 
 	button2 := widget.NewButton("Change data #2", func() {
-		if len(dataList) >= 2 {
-			boundValue := dataList[1]
+		if len(boundDataList) >= 2 {
+			boundValue := boundDataList[1]
 			value, _ := boundValue.Get()
-			myData := value.(MyData)
+			myData := value.(model.MyData)
 			myData.Sub.Data = time.Now().Format("15:04:05")
 			boundValue.Set(myData)
 		}
